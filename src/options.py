@@ -13,7 +13,7 @@ class TrainOptions():
         
         # ---------------------------------------- step 2/5 : data loading... ------------------------------------------------
         self.parser.add_argument("--data_source", type=str, default='', required=True, help="dataset root")
-        self.parser.add_argument("--train_bs", type=int, default=8, help="size of the training batches (train_bs per GPU)")
+        self.parser.add_argument("--train_bs", type=int, default=4, help="size of the training batches (train_bs per GPU)")
         self.parser.add_argument("--val_bs", type=int, default=2, help="size of the validating batches (val_bs per GPU)")
         self.parser.add_argument("--crop", type=int, default=384, help="image size after cropping")
         self.parser.add_argument("--num_workers", type=int, default=4, help="number of cpu threads to use during batch generation")
