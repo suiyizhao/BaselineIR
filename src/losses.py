@@ -4,7 +4,6 @@ import torch.fft
 import torch.nn as nn
 
 import torch.nn.functional as F
-from torch.autograd import Variable
 
 class LossCont(nn.Module):
     def __init__(self):
