@@ -21,7 +21,7 @@ class TrainOptions():
         # ---------------------------------------- step 3/5 : model defining... ------------------------------------------------
         self.parser.add_argument("--data_parallel", action='store_true', help="if specified, training by data paralleling")
         self.parser.add_argument("--pretrained", type=str, default=None, help="pretrained model path")
-        self.parser.add_argument("--num_res", type=int, default=8, help="number of resblocks after each convolution")
+        self.parser.add_argument("--num_res", type=int, default=4, help="number of resblocks after each convolution")
         self.parser.add_argument("--base_channel", type=int, default=32, help="number of output channels for first convolution")
         
         # ---------------------------------------- step 4/5 : requisites defining... ------------------------------------------------
@@ -29,8 +29,8 @@ class TrainOptions():
         self.parser.add_argument("--n_epochs", type=int, default=2000, help="number of epochs of training")
         
         # ---------------------------------------- step 5/5 : training... ------------------------------------------------
-        self.parser.add_argument("--print_gap", type=int, default=40, help="the gap between two print operations, in iteration")
-        self.parser.add_argument("--val_gap", type=int, default=40, help="the gap between two validations, also the gap between two saving operation, in epoch")
+        self.parser.add_argument("--print_gap", type=int, default=20, help="the gap between two print operations, in iteration")
+        self.parser.add_argument("--val_gap", type=int, default=20, help="the gap between two validations, also the gap between two saving operation, in epoch")
     
     def parse(self, show=True):
         opt = self.parser.parse_args()
