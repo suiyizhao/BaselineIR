@@ -2,7 +2,7 @@ import time
 import torch
 
 from torch.utils.data import DataLoader
-from torchvision.utils import save_image, make_grid
+from torchvision.utils import save_image
 
 from utils import *
 from options import TestOptions
