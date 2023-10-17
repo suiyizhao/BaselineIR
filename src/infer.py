@@ -32,7 +32,6 @@ print('---------------------------------------- step 4/4 : testing... ----------
 def main():
     model.eval()
     
-    psnr_meter = AverageMeter()
     time_meter = AverageMeter()
     
     for i, (img, path) in enumerate(infer_dataloader):
