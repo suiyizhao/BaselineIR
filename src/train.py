@@ -7,7 +7,6 @@ import torch.nn as nn
 from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from torchvision.utils import save_image, make_grid
-from warmup_scheduler import GradualWarmupScheduler
 
 from utils import *
 from options import TrainOptions
