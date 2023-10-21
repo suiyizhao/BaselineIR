@@ -1,0 +1,11 @@
+# train
+cd src
+python train.py --data_source /your/dataset/path --experiment your_experiment_name
+
+# test
+cd src
+python test.py --data_source /your/dataset/path --model_path /your/model/path --experiment your_experiment_name
+
+# infer
+cd src
+python infer.py --data_source /your/dataset/path --model_path /your/model/path --experiment your_experiment_name --save_image
