@@ -49,7 +49,7 @@ print('---------------------------------------- step 4/5 : requisites defining..
 criterion_cont = LossCont()
 criterion_fft = LossFreqReco()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.5, 0.999))
+optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.9, 0.999))
 
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [500,1000,1500,2000], 0.5)
 
