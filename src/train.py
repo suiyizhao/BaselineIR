@@ -49,9 +49,9 @@ print('---------------------------------------- step 4/5 : requisites defining..
 criterion_cont = LossCont()
 criterion_fft = LossFreqReco()
 
-optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(0.9, 0.999))
+optimizer = torch.optim.Adam(model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
 
-scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [500,1000,1500,2000], 0.5)
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, opt.decay_timestamp, opt.decay_rate)
 
 print('---------------------------------------- step 5/5 : training... ----------------------------------------------------')
 def main():
@@ -93,7 +93,7 @@ def train(epoch, optimal):
         
         loss_cont = criterion_cont(preds, gts)
         loss_fft = criterion_fft(preds, gts)
-        loss = loss_cont + 0.1 * loss_fft
+        loss = loss_cont + opt.lambda_fft * loss_fft
         
         loss.backward()
         optimizer.step()
