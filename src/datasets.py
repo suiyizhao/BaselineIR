@@ -1,3 +1,4 @@
+import os
 import glob
 import torch
 import random
@@ -26,6 +27,9 @@ class PairedImgDataset(Dataset):
             self.gt_paths = sorted(glob.glob(data_source + '/' + mode + '/gt' + '/*.*'))
 
     def __getitem__(self, index):
+        
+        name = os.path.basename(self.img_paths[index % len(self.img_paths)])
+        
         img = Image.open(self.img_paths[index % len(self.img_paths)]).convert('RGB')
         gt = Image.open(self.gt_paths[index % len(self.gt_paths)]).convert('RGB')
         
@@ -47,7 +51,10 @@ class PairedImgDataset(Dataset):
         img = self.transform(img)
         gt = self.transform(gt)
         
-        return img, gt
+        if self.mode == 'train' or self.mode == 'val':
+            return img, gt
+        else:
+            return img, gt, name
 
     def __len__(self):
         return max(len(self.img_paths), len(self.gt_paths))
@@ -62,15 +69,17 @@ class SingleImgDataset(Dataset):
         
         self.img_paths = sorted(glob.glob(data_source + '/' + 'test' + '/blurry' + '/*/*.*'))
 
-    def __getitem__(self, index):
-        
+    def __getitem__(self, index):                    
+                              
         path = self.img_paths[index % len(self.img_paths)]
+        
+        name = os.path.basename(path)
         
         img = Image.open(path).convert('RGB')
         
         img = self.transform(img)
         
-        return img, path
+        return img, name
 
     def __len__(self):
         return len(self.img_paths)
