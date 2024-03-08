@@ -1,10 +1,12 @@
 import os
 import time
+import math
 import torch
 import random
 import shutil
 import numpy as np
 
+from ptflops import get_model_complexity_info
 from skimage.metrics import peak_signal_noise_ratio, structural_similarity
 
 def set_random_seed(seed, deterministic=False):
@@ -82,9 +84,12 @@ def print_para_num(model):
     
     total_params = sum(p.numel() for p in model.parameters())
     total_trainable_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    inp_shape = (3, 256, 256)
+    macs, params = get_model_complexity_info(model, inp_shape, verbose=False, print_per_layer_stat=False)
+    print('GMACs with shape ' + str(inp_shape) + ':', macs)
     print('total parameters: %d' % total_params)
     print('trainable parameters: %d' % total_trainable_params)
-
+     
 class AverageMeter(object):
     
     """
@@ -172,3 +177,13 @@ def tensor2img(tensor_image):
         tensor_image = tensor_image.cpu()
     numpy_image = np.uint8(tensor_image.numpy())
     return numpy_image
+
+def split_img(x, h_chunk, w_chunk):
+    x = torch.cat(x.chunk(h_chunk, dim=2), dim=0)
+    x = torch.cat(x.chunk(w_chunk, dim=3), dim=0)
+    return x
+
+def cat_img(x, h_chunk, w_chunk):
+    x = torch.cat(x.chunk(w_chunk, dim=0), dim=3)
+    x = torch.cat(x.chunk(h_chunk, dim=0), dim=2)
+    return x
