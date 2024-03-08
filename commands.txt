@@ -4,8 +4,8 @@ python train.py --data_source /your/dataset/path --experiment your_experiment_na
 
 # test
 cd src
-python test.py --data_source /your/dataset/path --model_path /your/model/path --experiment your_experiment_name
+python test.py --data_source /your/dataset/path --experiment your_experiment_name --model_path /your/model/path --train_crop your_crop_size_in_training --save_image
 
 # infer
 cd src
-python infer.py --data_source /your/dataset/path --model_path /your/model/path --experiment your_experiment_name --save_image
+python infer.py --data_source /your/dataset/path --experiment your_experiment_name --model_path /your/model/path --train_crop your_crop_size_in_training --save_image
