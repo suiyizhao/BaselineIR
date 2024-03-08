@@ -6,7 +6,7 @@ from torchvision.utils import save_image
 
 from utils import *
 from options import TestOptions
-from models import NAFNetLocal
+from models import NAFNet, NAFNetLocal
 from datasets import SingleImgDataset
 
 print('---------------------------------------- step 1/4 : parameters preparing... ----------------------------------------')
@@ -49,7 +49,7 @@ def main():
     
     time_meter = AverageMeter()
     
-    for i, (img, path) in enumerate(infer_dataloader):
+    for i, (img, name) in enumerate(infer_dataloader):
         img = img.cuda()
 
         with torch.no_grad():
@@ -60,13 +60,13 @@ def main():
         pred_clip = torch.clamp(pred, 0, 1)
 
         time_meter.update(times, 1)
-
-        print('Iteration: ' + str(i+1) + '/' + str(len(infer_dataset)) + '  Processing image... ' + str(path) + '  Time ' + str(times))
+        
+        print('Iteration[' + str(i+1) + '/' + str(len(infer_dataset)) + ']' + '  Processing image... ' + name[0] + '  Time ' + str(times))
             
         if opt.save_image:
-            save_image(pred_clip, image_dir + '/' + os.path.basename(path[0]))
-            
-    print('Avg time: ' + str(time_meter.average()))
+            save_image(pred_clip, image_dir + '/' + name[0])
+    
+    print('Average Time: {:.4f}'.format(time_meter.average()))
         
 if __name__ == '__main__':
     main()
