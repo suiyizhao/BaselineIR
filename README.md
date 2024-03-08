@@ -1,11 +1,14 @@
 # BaselineIR
-### -Dependencies-
-- python 3.8.10
-- torch 2.2.1
-- torchvision 0.17.1
-- tensorboard 2.7.0
+### -Platform-
+- python 3.10.8
+- torch 2.1.2
+- torchvision 0.16.2
+- tensorboard 2.15.1
 
 ### -Usage-
+#### Configure the environment
+cd BaselineIR
+pip install -r requirements.txt
 #### Prepare dataset:
 Please ensure that the data organization matches the [code format for train & test](https://github.com/suiyizhao/BaselineIR/blob/master/src/datasets.py#:~:text=self.img_paths%20%3D%20sorted(glob.glob,%27/%27%20%20%2B%20mode%20%2B%20%27/sharp%27%20%2B%20%27/*/*.*%27)) or the [code format for infer](https://github.com/suiyizhao/BaselineIR/blob/master/src/datasets.py#:~:text=self.img_paths%20%3D%20sorted(glob.glob(data_source%20%2B%20%27/%27%20%2B%20%27test%27%20%2B%20%27/blurry%27%20%2B%20%27/*/*.*%27))).
 #### Train:
