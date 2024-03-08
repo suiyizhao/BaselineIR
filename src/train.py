@@ -128,7 +128,6 @@ def train(epoch, optimal):
             writer.add_scalar('Loss_lpips', iter_lpips_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_fft', iter_fft_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             
-            
     writer.add_scalar('lr', scheduler.get_last_lr()[0], epoch)
     
     torch.save({'model': model.state_dict(), 'optimizer': optimizer.state_dict(), 'scheduler': scheduler.state_dict(), 'epoch': epoch, 'optimal': optimal}, models_dir + '/latest.pth')
