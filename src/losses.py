@@ -1,4 +1,5 @@
 import math
+import pyiqa
 import torch
 import torch.fft
 import torch.nn as nn
@@ -13,9 +14,18 @@ class LossCont(nn.Module):
     def forward(self, imgs, gts):
         return self.criterion(imgs, gts)
 
-class LossFreqReco(nn.Module):
+class LossLPIPS(nn.Module):
     def __init__(self):
-        super(LossFreqReco, self).__init__()
+        super(LossLPIPS, self).__init__()
+        device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+        self.criterion = pyiqa.create_metric('lpips', device=device, as_loss=True)
+        
+    def forward(self, imgs, gts):
+        return self.criterion(imgs, gts)
+    
+class LossFFT(nn.Module):
+    def __init__(self):
+        super(LossFFT, self).__init__()
         self.criterion = nn.L1Loss()
         
     def forward(self, imgs, gts):
