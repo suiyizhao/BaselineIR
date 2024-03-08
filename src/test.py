@@ -6,7 +6,7 @@ from torchvision.utils import save_image, make_grid
 
 from utils import *
 from options import TestOptions
-from models import UNet
+from models import NAFNet, NAFNetLocal
 from datasets import PairedImgDataset
 
 print('---------------------------------------- step 1/4 : parameters preparing... ----------------------------------------')
@@ -25,7 +25,23 @@ test_dataloader = DataLoader(test_dataset, batch_size=1, shuffle=False, num_work
 print('successfully loading validating pairs. =====> qty:{}'.format(len(test_dataset)))
 
 print('---------------------------------------- step 3/4 : model defining... ----------------------------------------------')
-model = UNet().cuda()
+if opt.train_crop is None:
+    model = NAFNet(img_channel=3, 
+               width=opt.width, 
+               middle_blk_num=opt.middle_blk_num, 
+               enc_blk_nums=opt.enc_blk_nums, 
+               dec_blk_nums=opt.dec_blk_nums
+               ).cuda()
+else:
+    model = NAFNetLocal(img_channel=3, 
+                   width=opt.width, 
+                   middle_blk_num=opt.middle_blk_num, 
+                   enc_blk_nums=opt.enc_blk_nums, 
+                   dec_blk_nums=opt.dec_blk_nums,
+                   train_size=(1, 3, opt.train_crop, opt.train_crop)
+                   ).cuda()
+
+print_para_num(model)
 
 model.load_state_dict(torch.load(opt.model_path))
 print('successfully loading pretrained model.')
@@ -38,28 +54,28 @@ def main():
     time_meter = AverageMeter()
     
     with open(txt_path, 'w') as f:
-        for i, (imgs, gts) in enumerate(test_dataloader):
-            imgs, gts = imgs.cuda(), gts.cuda()
+        for i, (img, gt, name) in enumerate(test_dataloader):
+            img, gt = img.cuda(), gt.cuda()
 
             with torch.no_grad():
                 start_time = time.time()
-                preds = model(imgs)
+                pred = model(img)
                 times = time.time() - start_time
 
-            preds_clip = torch.clamp(preds, 0, 1)
+            pred_clip = torch.clamp(pred, 0, 1)
 
-            cur_psnr = get_metrics(preds_clip, gts)
+            cur_psnr = get_metrics(pred_clip, gt)
             psnr_meter.update(cur_psnr, 1)
             time_meter.update(times, 1)
 
-            print('Iteration[{:0>4}/{:0>4}] PSNR: {:.4f} Time: {:.4f}'.format(i+1, len(test_dataset), cur_psnr, times))
-            f.write('Iteration[' + str(i+1) + '/' + str(len(test_dataset)) + ']' + ' PSNR: ' + str(cur_psnr) + ' Time: ' + str(times) + '\n')
+            print('Iteration[' + str(i+1) + '/' + str(len(test_dataset)) + ']' + '  Processing image... ' + name[0] + '   PSNR: ' + str(cur_psnr) + '  Time ' + str(times))
+            f.write('Iteration[' + str(i+1) + '/' + str(len(test_dataset)) + ']' + '  Processing image... ' + name[0] + '   PSNR: ' + str(cur_psnr) + ' Time: ' + str(times) + '\n')
             
             if opt.save_image:
-                save_image(preds_clip, single_dir + '/' + str(i).zfill(4) + '.png')
-                save_image(imgs, multiple_dir + '/' + str(i).zfill(4) + '_img.png')
-                save_image(preds_clip, multiple_dir + '/' + str(i).zfill(4) + '_restored.png')
-                save_image(gts, multiple_dir + '/' + str(i).zfill(4) + '_gt.png')
+                save_image(pred_clip, single_dir + '/' + name[0])
+                save_image(img, multiple_dir + '/' + name[0].split('.')[0] + '_img.png')
+                save_image(pred_clip, multiple_dir + '/' + name[0].split('.')[0] + '_restored.png')
+                save_image(gt, multiple_dir + '/' + name[0].split('.')[0] + '_gt.png')
             
         print('Average: PSNR: {:.4f} Time: {:.4f}'.format(psnr_meter.average(), time_meter.average()))
         f.write('Average: PSNR: ' + str(psnr_meter.average()) + ' Time: ' + str(time_meter.average()) + '\n')
