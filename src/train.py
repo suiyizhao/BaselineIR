@@ -127,7 +127,7 @@ def train(epoch, optimal):
             writer.add_scalar('Loss_cont', iter_cont_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_lpips', iter_lpips_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_fft', iter_fft_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
-            break
+            
             
     writer.add_scalar('lr', scheduler.get_last_lr()[0], epoch)
     
