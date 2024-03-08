@@ -6,7 +6,7 @@ from torchvision.utils import save_image
 
 from utils import *
 from options import TestOptions
-from models import UNet
+from models import NAFNetLocal
 from datasets import SingleImgDataset
 
 print('---------------------------------------- step 1/4 : parameters preparing... ----------------------------------------')
@@ -22,7 +22,22 @@ infer_dataloader = DataLoader(infer_dataset, batch_size=1, shuffle=False, num_wo
 print('successfully loading inferring pairs. =====> qty:{}'.format(len(infer_dataset)))
 
 print('---------------------------------------- step 3/4 : model defining... ----------------------------------------------')
-model = UNet().cuda()
+if opt.train_crop is None:
+    model = NAFNet(img_channel=3, 
+               width=opt.width, 
+               middle_blk_num=opt.middle_blk_num, 
+               enc_blk_nums=opt.enc_blk_nums, 
+               dec_blk_nums=opt.dec_blk_nums
+               ).cuda()
+else:
+    model = NAFNetLocal(img_channel=3, 
+                   width=opt.width, 
+                   middle_blk_num=opt.middle_blk_num, 
+                   enc_blk_nums=opt.enc_blk_nums, 
+                   dec_blk_nums=opt.dec_blk_nums,
+                   train_size=(1, 3, opt.train_crop, opt.train_crop)
+                   ).cuda()
+    
 print_para_num(model)
 
 model.load_state_dict(torch.load(opt.model_path))
