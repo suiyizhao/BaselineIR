@@ -126,7 +126,7 @@ def train(epoch, optimal):
             save_image(torch.cat((imgs,preds.detach(),gts),0), train_images_dir + '/epoch_{:0>4}_iter_{:0>4}.png'.format(epoch, i+1), nrow=opt.train_bs, normalize=True, scale_each=True)
             
         if (i+1) % opt.print_gap == 0:
-            print('Training: Epoch[{:0>4}/{:0>4}] Iteration[{:0>4}/{:0>4}] Loss_cont: {:.4f} Loss_lpips: {:.4f} Loss_fft: {:.4f} Time: {:.4f} ETA: {}'.format(epoch, opt.n_epochs, i + 1, max_iter, iter_cont_meter.average(), iter_lpips_meter.average(), iter_fft_meter.average(), iter_timer.timeit(), ETA.get_eta(epoch, i + 1, iter_timer.last_timestamp)))
+            print('Training:  Epoch[{:0>4}/{:0>4}]  Iteration[{:0>4}/{:0>4}]  Loss_cont:{:.4f}  Loss_lpips:{:.4f}  Loss_fft:{:.4f}  Time:{:.4f}  ETA:{}'.format(epoch, opt.n_epochs, i + 1, max_iter, iter_cont_meter.average(), iter_lpips_meter.average(), iter_fft_meter.average(), iter_timer.timeit(), ETA.get_eta(epoch, i + 1, iter_timer.last_timestamp)))
             writer.add_scalar('Loss_cont', iter_cont_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_lpips', iter_lpips_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_fft', iter_fft_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
@@ -146,7 +146,7 @@ def val(epoch, optimal):
     model_val.load_state_dict(model.state_dict())
     model_val.eval()
     
-    print(''); print('Validating...', end=' ')
+    print(''); print('Validating... ', end=' ')
     
     psnr_meter = AverageMeter()
     psnr_meter_val = AverageMeter()
@@ -171,7 +171,7 @@ def val(epoch, optimal):
                 save_image(gts, val_images_dir + '/epoch_{:0>4}_iter_{:0>4}_gt.png'.format(epoch, i+1), nrow=opt.val_bs, normalize=True, scale_each=True)
             save_image(preds_val, val_images_dir + '/epoch_{:0>4}_iter_{:0>4}_restored.png'.format(epoch, i+1), nrow=opt.val_bs, normalize=True, scale_each=True)
     
-    print('Epoch[{:0>4}/{:0>4}] PSNR: {:.4f} PSNR-Local: {:.4f} Time: {:.4f}'.format(epoch, opt.n_epochs, psnr_meter.average(), psnr_meter_val.average(), timer.timeit())); print('')
+    print('Epoch[{:0>4}/{:0>4}]  PSNR: {:.4f}  PSNR-Local: {:.4f}  Time: {:.4f}'.format(epoch, opt.n_epochs, psnr_meter.average(), psnr_meter_val.average(), timer.timeit())); print('')
     
     if optimal[0] < psnr_meter_val.average():
         optimal[0] = psnr_meter_val.average()
