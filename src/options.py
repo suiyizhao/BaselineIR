@@ -13,7 +13,7 @@ class TrainOptions():
         
         # ---------------------------------------- step 2/5 : data loading... ------------------------------------------------
         self.parser.add_argument("--data_source", type=str, default='', required=True, help="dataset root")
-        self.parser.add_argument("--train_bs", type=int, default=4, help="size of the training batches (train_bs per GPU)")
+        self.parser.add_argument("--train_bs", type=int, default=6, help="size of the training batches (train_bs per GPU)")
         self.parser.add_argument("--val_bs", type=int, default=1, help="size of the validating batches (val_bs per GPU)")
         self.parser.add_argument("--crop", type=int, default=256, help="image size after cropping")
         self.parser.add_argument("--num_workers", type=int, default=8, help="number of cpu threads to use during batch generation")
@@ -39,6 +39,8 @@ class TrainOptions():
         # ---------------------------------------- step 5/5 : training... ------------------------------------------------
         self.parser.add_argument("--print_gap", type=int, default=50, help="the gap between two print operations, in iteration")
         self.parser.add_argument("--val_gap", type=int, default=50, help="the gap between two validations, also the gap between two saving operation, in epoch")
+        
+        self.parser.add_argument("--debug", action='store_true', help="if specified, val_gap is set to 1; and the training process will be killed when the first batch is finished")
         
         self.parser.add_argument("--lambda_cont", type=float, default=1., help="the content loss weight for training")
         self.parser.add_argument("--lambda_lpips", type=float, default=0., help="the lpips loss weight for training")
