@@ -8,6 +8,7 @@
 ### -Usage-
 #### Configure the environment
 ```
+git clone https://github.com/suiyizhao/BaselineIR.git
 cd BaselineIR
 pip install -r requirements.txt
 cd src
