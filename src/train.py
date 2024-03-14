@@ -68,6 +68,8 @@ optimizer = torch.optim.AdamW(model.parameters(), lr=opt.lr, betas=(opt.beta1, o
 
 scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, opt.n_epochs, eta_min=opt.eta_min)
 
+ETA = ETA(opt.n_epochs, len(train_dataloader), opt.print_gap)
+
 print('---------------------------------------- step 5/5 : training... ----------------------------------------------------') \
 if not opt.debug else print('---------------------------------------- step 5/5 : debugging... ----------------------------------------------------')
 def main():
@@ -124,7 +126,7 @@ def train(epoch, optimal):
             save_image(torch.cat((imgs,preds.detach(),gts),0), train_images_dir + '/epoch_{:0>4}_iter_{:0>4}.png'.format(epoch, i+1), nrow=opt.train_bs, normalize=True, scale_each=True)
             
         if (i+1) % opt.print_gap == 0:
-            print('Training: Epoch[{:0>4}/{:0>4}] Iteration[{:0>4}/{:0>4}] Loss_cont: {:.4f} Loss_lpips: {:.4f} Loss_fft: {:.4f} Time: {:.4f}'.format(epoch, opt.n_epochs, i + 1, max_iter, iter_cont_meter.average(), iter_lpips_meter.average(), iter_fft_meter.average(), iter_timer.timeit()))
+            print('Training: Epoch[{:0>4}/{:0>4}] Iteration[{:0>4}/{:0>4}] Loss_cont: {:.4f} Loss_lpips: {:.4f} Loss_fft: {:.4f} Time: {:.4f} ETA: {}'.format(epoch, opt.n_epochs, i + 1, max_iter, iter_cont_meter.average(), iter_lpips_meter.average(), iter_fft_meter.average(), iter_timer.timeit(), ETA.get_eta(epoch, i + 1, iter_timer.last_timestamp)))
             writer.add_scalar('Loss_cont', iter_cont_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_lpips', iter_lpips_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
             writer.add_scalar('Loss_fft', iter_fft_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
