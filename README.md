@@ -28,6 +28,11 @@ python test.py --data_source /your/dataset/path --experiment your_experiment_nam
 python infer.py --data_source /your/dataset/path --experiment your_experiment_name --model_path /your/model/path --train_crop your_crop_size_in_training --save_image
 ```
 ### -Other functions-
+#### Debug
+```
+# During training, it is recommended to debug first to make sure the code is working properly
+python train.py --data_source /your/dataset/path --experiment your_experiment_name --debug
+```
 #### Reproducible training
 ```
 # Manually modify the set_random_seed (utils.py) function by setting "deterministic=True"
