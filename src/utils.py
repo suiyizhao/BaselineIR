@@ -121,19 +121,50 @@ class Timer(object):
     Computes the times.
     """
     
-    def __init__(self, start=True):
-        if start:
-            self.start()
+    def __init__(self):
+        self.last_timestamp = 0. # Can be used between two timeit()
+        self.start()
 
     def start(self):
         self.time_begin = time.time()
 
     def timeit(self, auto_reset=True):
+        
         times = time.time() - self.time_begin
+        self.last_timestamp = times
+        
         if auto_reset:
             self.start()
+                   
         return times
+
+class ETA(object):
     
+    """
+    Computes the eta.
+    """
+    
+    def __init__(self, n_epochs, n_iterations, print_gap):
+        
+        self.n_epochs = n_epochs
+        self.n_iterations = n_iterations
+        self.print_gap = print_gap
+        
+        self.speed = 0. # seconds per iteration
+        
+    def get_eta(self, cur_epoch, cur_iteration, seconds_per_print):
+        elapsed_iterations = ((cur_epoch -1) * self.n_iterations) + cur_iteration - self.print_gap
+        elapsed_time = elapsed_iterations * self.speed
+        self.speed = (elapsed_time + seconds_per_print) / (elapsed_iterations + self.print_gap)
+        eta = ((self.n_epochs * self.n_iterations) - elapsed_iterations) * self.speed
+        days = int(eta // (60*60*24))
+        hours = int((eta - (days * 60*60*24)) // (60*60))
+        minutes = int((eta - (days * 60*60*24) - (hours * 60*60)) // (60))
+        seconds = int((eta - (days * 60*60*24) - (hours * 60*60) - (minutes * 60)))
+        
+        return str(days) + ' days ' + str(hours).zfill(2) + ':' + str(minutes).zfill(2) + ':' + str(seconds).zfill(2)
+        
+
 def get_metrics(tensor_image1, tensor_image2, psnr_only=True, reduction=False):
     
     '''
