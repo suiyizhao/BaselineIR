@@ -138,6 +138,38 @@ class Timer(object):
                    
         return times
 
+class LossManager:
+    def __init__(self):
+        self.losses = {}
+        self.meters = {}
+        self.lambdas = {}
+    
+    def add_loss(self, name, criterion, lambda_weight):
+        self.losses[name] = criterion
+        self.meters[name] = AverageMeter()
+        self.lambdas[name] = lambda_weight
+        
+    def compute_loss(self, preds, gts):
+        total_loss = 0
+        for name, criterion in self.losses.items():
+            loss = criterion(preds, gts)
+            total_loss += self.lambdas[name] * loss
+            self.meters[name].update(loss.item()*preds.shape[0], preds.shape[0])
+        return total_loss
+
+    def get_loss_string(self):
+        loss_str = ''
+        for name, meter in self.meters.items():
+            loss_str += f'Loss_{name}:{meter.average():.4f}  '
+        return loss_str.rstrip()
+            
+    def log_losses(self, writer, epoch, iteration, max_iter):
+        # save to tensorboard
+        for name, meter in self.meters.items():
+            writer.add_scalar(f'Loss_{name}', 
+                            meter.average(auto_reset=True),
+                            iteration + (epoch-1) * max_iter)
+
 class ETA(object):
     
     """
@@ -182,7 +214,7 @@ def get_metrics(tensor_image1, tensor_image2, psnr_only=True, reduction=False):
     batch_size = numpy_imgs.shape[0]
     for i in range(batch_size):
         if not psnr_only:
-            ssim_value += structural_similarity(numpy_imgs[i],numpy_gts[i], multichannel=True, gaussian_weights=True, use_sample_covariance=False)
+            ssim_value += structural_similarity(numpy_imgs[i],numpy_gts[i], channel_axis=-1, gaussian_weights=True, use_sample_covariance=False)
         psnr_value += peak_signal_noise_ratio(numpy_imgs[i],numpy_gts[i])
         
     if reduction:
