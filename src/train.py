@@ -60,9 +60,10 @@ if opt.pretrained is not None:
     print('successfully loading pretrained model.')
     
 print('---------------------------------------- step 4/5 : requisites defining... -----------------------------------------')
-criterion_cont = LossCont()
-criterion_lpips = LossLPIPS()
-criterion_fft = LossFFT()
+loss_manager = LossManager()
+loss_manager.add_loss('cont', LossCont(), opt.lambda_cont)
+loss_manager.add_loss('fft', LossFFT(), opt.lambda_fft)
+# loss_manager.add_loss('lpips', LossLPIPS(), opt.lambda_lpips)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
 
@@ -98,9 +99,6 @@ def train(epoch, optimal):
     
     max_iter = len(train_dataloader)
     
-    iter_cont_meter = AverageMeter()
-    iter_lpips_meter = AverageMeter()
-    iter_fft_meter = AverageMeter()
     iter_timer = Timer()
     
     for i, (imgs, gts) in enumerate(train_dataloader):
@@ -110,26 +108,18 @@ def train(epoch, optimal):
         optimizer.zero_grad()
         preds = model(imgs)
         
-        loss_cont = criterion_cont(preds, gts)
-        loss_lpips = criterion_lpips(preds, gts)
-        loss_fft = criterion_fft(preds, gts)
-        loss = opt.lambda_cont * loss_cont + opt.lambda_lpips * loss_lpips + opt.lambda_fft * loss_fft
+        loss = loss_manager.compute_loss(preds, gts)
         
         loss.backward()
         optimizer.step()
-        
-        iter_cont_meter.update(loss_cont.item()*cur_batch, cur_batch)
-        iter_lpips_meter.update(loss_lpips.item()*cur_batch, cur_batch)
-        iter_fft_meter.update(loss_fft.item()*cur_batch, cur_batch)
         
         if i == 0:
             save_image(torch.cat((imgs,preds.detach(),gts),0), train_images_dir + '/epoch_{:0>4}_iter_{:0>4}.png'.format(epoch, i+1), nrow=opt.train_bs, normalize=True, scale_each=True)
             
         if (i+1) % opt.print_gap == 0:
-            print('Training:  Epoch[{:0>4}/{:0>4}]  Iteration[{:0>4}/{:0>4}]  Loss_cont:{:.4f}  Loss_lpips:{:.4f}  Loss_fft:{:.4f}  Time:{:.4f}  ETA:{}'.format(epoch, opt.n_epochs, i + 1, max_iter, iter_cont_meter.average(), iter_lpips_meter.average(), iter_fft_meter.average(), iter_timer.timeit(), ETA.get_eta(epoch, i + 1, iter_timer.last_timestamp)))
-            writer.add_scalar('Loss_cont', iter_cont_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
-            writer.add_scalar('Loss_lpips', iter_lpips_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
-            writer.add_scalar('Loss_fft', iter_fft_meter.average(auto_reset=True), i+1 + (epoch - 1) * max_iter)
+            print('Training: Epoch[{:0>4}/{:0>4}]  Iteration[{:0>4}/{:0>4}]  {}  Time:{:.4f}  ETA:{}'.format(epoch, opt.n_epochs, i + 1, max_iter, loss_manager.get_loss_string(), iter_timer.timeit(), ETA.get_eta(epoch, i + 1, iter_timer.last_timestamp)))
+            
+            loss_manager.log_losses(writer, epoch, i+1, max_iter)
             
             if opt.debug:
                 opt.val_gap = 1
@@ -162,7 +152,7 @@ def val(epoch, optimal):
         preds = torch.clamp(preds, 0, 1)
         preds_val = torch.clamp(preds_val, 0, 1)
         
-        psnr_meter.update(get_metrics(preds, gts), imgs.shape[0])
+        psnr_meter.update(get_metrics(preds, gts),imgs.shape[0])
         psnr_meter_val.update(get_metrics(preds_val, gts), imgs.shape[0])
         
         if i == 0:
@@ -183,4 +173,3 @@ def val(epoch, optimal):
     
 if __name__ == '__main__':
     main()
-    
