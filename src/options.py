@@ -28,7 +28,7 @@ class TrainOptions():
         self.parser.add_argument("--dec_blk_nums", type=int, nargs='+', default=[1,1,1,1], help="number of the blocks in decoder of each scale")
         
         # ---------------------------------------- step 4/5 : requisites defining... ------------------------------------------------
-        self.parser.add_argument("--lr", type=float, default=0.001, help="learning rate")
+        self.parser.add_argument("--lr", type=float, default=0.0005, help="learning rate")
         self.parser.add_argument("--n_epochs", type=int, default=3000, help="number of epochs of training")
         
         self.parser.add_argument("--beta1", type=float, default=0.9, help="hyper-parameter beta1 for Adam optimizer")
