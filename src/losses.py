@@ -38,3 +38,19 @@ class LossFFT(nn.Module):
         _imag = gts.imag
         gts = torch.cat([_real, _imag], dim=1)
         return self.criterion(imgs, gts)
+
+class LossTV(nn.Module):
+    def __init__(self, p=1):
+        
+        super(LossTV, self).__init__()
+        self.p = p
+        
+    def forward(self, imgs):
+        v_diff = imgs[:, :, 1:, :] - imgs[:, :, :-1, :]
+        h_diff = imgs[:, :, :, 1:] - imgs[:, :, :, :-1]
+        
+        v_loss = torch.mean(torch.abs(v_diff))
+        h_loss = torch.mean(torch.abs(h_diff))
+            
+        return v_loss + h_loss
+
