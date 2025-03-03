@@ -12,7 +12,7 @@ from torchvision.utils import save_image, make_grid
 from models import NAFNet, NAFNetLocal
 from utils import *
 from options import TrainOptions
-from losses import LossCont, LossLPIPS, LossFFT
+from losses import LossCont, LossLPIPS, LossFFT, LossTV
 from datasets import PairedImgDataset
 
 print('---------------------------------------- step 1/5 : parameters preparing... ----------------------------------------')
@@ -64,6 +64,7 @@ loss_manager = LossManager()
 loss_manager.add_loss('cont', LossCont(), opt.lambda_cont)
 loss_manager.add_loss('fft', LossFFT(), opt.lambda_fft)
 # loss_manager.add_loss('lpips', LossLPIPS(), opt.lambda_lpips)
+# loss_manager.add_loss('tv', LossTV(), opt.lambda_tv, arg_count=1)
 
 optimizer = torch.optim.AdamW(model.parameters(), lr=opt.lr, betas=(opt.beta1, opt.beta2))
 
