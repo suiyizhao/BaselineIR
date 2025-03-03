@@ -170,6 +170,46 @@ class LossManager:
                             meter.average(auto_reset=True),
                             iteration + (epoch-1) * max_iter)
 
+class LossManager:
+    def __init__(self):
+        self.losses = {}
+        self.meters = {}
+        self.lambdas = {}
+        self.arg_counts = {}
+    
+    def add_loss(self, name, criterion, lambda_weight, arg_count=2):
+        
+        self.losses[name] = criterion
+        self.meters[name] = AverageMeter()
+        self.lambdas[name] = lambda_weight
+        self.arg_counts[name] = arg_count
+        
+    def compute_loss(self, preds, gts):
+        total_loss = 0
+        for name, criterion in self.losses.items():
+            
+            if self.arg_counts[name] == 1:
+                loss = criterion(preds)  
+            else:
+                loss = criterion(preds, gts)  
+            
+            total_loss += self.lambdas[name] * loss
+            self.meters[name].update(loss.item()*preds.shape[0], preds.shape[0])
+        return total_loss
+
+    def get_loss_string(self):
+        loss_str = ''
+        for name, meter in self.meters.items():
+            loss_str += f'Loss_{name}:{meter.average():.4f}  '
+        return loss_str.rstrip()
+            
+    def log_losses(self, writer, epoch, iteration, max_iter):
+        # save to tensorboard
+        for name, meter in self.meters.items():
+            writer.add_scalar(f'Loss_{name}', 
+                            meter.average(auto_reset=True),
+                            iteration + (epoch-1) * max_iter)
+
 class ETA(object):
     
     """
