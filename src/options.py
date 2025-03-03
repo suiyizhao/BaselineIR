@@ -45,6 +45,7 @@ class TrainOptions():
         self.parser.add_argument("--lambda_cont", type=float, default=1., help="the content loss weight for training")
         self.parser.add_argument("--lambda_lpips", type=float, default=0., help="the lpips loss weight for training")
         self.parser.add_argument("--lambda_fft", type=float, default=0.1, help="the fft loss weight for training")
+        self.parser.add_argument("--lambda_tv", type=float, default=0.1, help="the tv loss weight for training")
     
     def parse(self, show=True):
         opt = self.parser.parse_args()
